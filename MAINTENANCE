@@ -24,7 +24,7 @@ sqlite3_test/sqltest.go
 Update code from https://github.com/sqlcipher/sqlcipher
 -------------------------------------------------------
 
-Current release: v3.1.0
+Current release: v3.3.0
 
 Execute:
 ./configure
