@@ -6,10 +6,10 @@ tracked for changes (maintenance details below):
 - https://github.com/libtom/libtomcrypt
 
 
-Update code from https://github.com/mattn/go-sqlite
----------------------------------------------------
+Update code from https://github.com/mattn/go-sqlite3
+----------------------------------------------------
 
-Current HEAD: a80c27ba3354e27b4c8dfbbd1165bc253ca7c522
+Current HEAD: 542ae647f8601bafd96233961b150cae198e0295
 
 Track files:
 
