@@ -1,3 +1,3 @@
 language: go
 go: 1.5
-script: go test -v .
+script: go test -cover .
