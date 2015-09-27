@@ -1,8 +1,6 @@
-go-sqlcipher
-==========
+## go-sqlcipher [![GoDoc](https://godoc.org/github.com/mutecomm/go-sqlcipher?status.png)](http://godoc.org/github.com/mutecomm/go-sqlcipher) [![Build Status](https://travis-ci.org/mutecomm/go-sqlcipher.png)](https://travis-ci.org/mutecomm/go-sqlcipher)
 
-Description
------------
+### Description
 
 Self-contained Go sqlite3 driver with an AES-256 encrypted sqlite3 database
 conforming to the built-in database/sql interface. It is based on:
@@ -14,16 +12,14 @@ conforming to the built-in database/sql interface. It is based on:
 SQLite itself is part of SQLCipher.
 
 
-Installation
-------------
+### Installation
 
 This package can be installed with the go get command:
 
     go get github.com/mutecomm/go-sqlcipher
 
 
-Documentation
--------------
+### Documentation
 
 API documentation can be found here:
 http://godoc.org/github.com/mutecomm/go-sqlcipher
@@ -31,8 +27,7 @@ http://godoc.org/github.com/mutecomm/go-sqlcipher
 Examples can be found under the `./_example` directory
 
 
-License
--------
+### License
 
 The code of the originating packages is covered by their respective licenses.
-See LICENSE file for details.
+See [LICENSE](LICENSE) file for details.
