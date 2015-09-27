@@ -9,7 +9,7 @@ tracked for changes (maintenance details below):
 Update code from https://github.com/mattn/go-sqlite3
 ----------------------------------------------------
 
-Current HEAD: 3b3f1d01b2696af5501697c35629048c227586ab
+Current HEAD: b808f01f660667b1510acf216aa2b9fe7f555ddb
 
 Track files:
 
@@ -17,6 +17,8 @@ error.go
 error_test.go
 sqlite3.go (dead code and extension loading coding removed)
 sqlite3_other.go
+sqlite3_test.go (adjust path)
+sqlite3_windows.go
 _example/simple/simple.go
 sqlite3_test/sqltest.go
 
