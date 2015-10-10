@@ -1,5 +1,11 @@
 ## go-sqlcipher [![GoDoc](https://godoc.org/github.com/mutecomm/go-sqlcipher?status.png)](http://godoc.org/github.com/mutecomm/go-sqlcipher) [![Build Status](https://travis-ci.org/mutecomm/go-sqlcipher.png)](https://travis-ci.org/mutecomm/go-sqlcipher)
 
+### Note
+
+Currently SQLCipher has a bug which prevents parallel access to an encrypted
+database. The automatic tests will fail until the bug is fixed.
+
+
 ### Description
 
 Self-contained Go sqlite3 driver with an AES-256 encrypted sqlite3 database
