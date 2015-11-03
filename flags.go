@@ -16,6 +16,9 @@ package sqlite3
 // make libtomcrypt thread-safe
 #cgo CFLAGS: -DLTC_PTHREAD
 
+// disable anything "not portable" in libtomcrypt
+#cgo CFLAGS: -DLTC_NO_ASM
+
 // disable assertions
 #cgo CFLAGS: -DNDEBUG
 
