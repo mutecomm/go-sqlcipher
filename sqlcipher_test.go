@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
-	"path"
+	"path/filepath"
 	"testing"
 
 	_ "github.com/mutecomm/go-sqlcipher"
@@ -20,7 +20,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	dbname := path.Join(tmpdir, "sqlcipher_test")
+	dbname := filepath.Join(tmpdir, "sqlcipher_test")
 	db, err = sql.Open("sqlite3", dbname)
 	if err != nil {
 		panic(err)
