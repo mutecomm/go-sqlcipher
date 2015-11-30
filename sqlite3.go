@@ -346,7 +346,7 @@ func (d *SQLiteDriver) Open(dsn string) (driver.Conn, error) {
 	name := C.CString(dsn)
 	defer C.free(unsafe.Pointer(name))
 	rv := C._sqlite3_open_v2(name, &db,
-		C.SQLITE_OPEN_FULLMUTEX|
+		C.SQLITE_OPEN_NOMUTEX|
 			C.SQLITE_OPEN_READWRITE|
 			C.SQLITE_OPEN_CREATE,
 		nil)
