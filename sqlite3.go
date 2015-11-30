@@ -71,7 +71,6 @@ import "C"
 import (
 	"database/sql"
 	"database/sql/driver"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -282,7 +281,7 @@ func errorString(err Error) string {
 //     "deferred", "exclusive".
 // go-sqlcipher adds the following query parameters to those used by SQLite:
 //   _pragma_key=XXX
-//     Specify raw PRAGMA key (must be 64 character hex string).
+//     Specify PRAGMA key.
 //   _pragma_cipher_page_size=XXX
 //     Set the PRAGMA cipher_page_size to adjust the page size.
 func (d *SQLiteDriver) Open(dsn string) (driver.Conn, error) {
@@ -368,13 +367,7 @@ func (d *SQLiteDriver) Open(dsn string) (driver.Conn, error) {
 	if params != nil {
 		// _pragma_key
 		if val := params.Get("_pragma_key"); val != "" {
-			if len(val) != 64 {
-				return nil, errors.New("sqlite3: _pragma_key doesn't have length 64")
-			}
-			if _, err := hex.DecodeString(val); err != nil {
-				return nil, fmt.Errorf("sqlite3: _pragma_key cannot be decoded: %s", err)
-			}
-			query := fmt.Sprintf("PRAGMA key = \"x'%s'\";", val)
+			query := fmt.Sprintf("PRAGMA key = \"%s\";", val)
 			if _, err := conn.Exec(query, nil); err != nil {
 				return nil, err
 			}

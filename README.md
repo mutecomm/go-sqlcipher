@@ -25,7 +25,7 @@ To create and open encrypted database files use the following DSN parameters:
 
 ```go
 key := "2DD29CA851E7B56E4697B0E1F08507293D761A05CE4D1B628663F411A8086D99"
-dbname := fmt.Sprintf("test?_pragma_key=%s&_pragma_cipher_page_size=4096", key)
+dbname := fmt.Sprintf("db?_pragma_key=x'%s'&_pragma_cipher_page_size=4096", key)
 db, _ := sql.Open("sqlite3", dbname)
 ```
 

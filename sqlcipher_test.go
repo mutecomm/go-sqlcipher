@@ -14,7 +14,7 @@ var db *sql.DB
 
 func init() {
 	// create DB
-	key := "2DD29CA851E7B56E4697B0E1F08507293D761A05CE4D1B628663F411A8086D99"
+	key := "passphrase"
 	tmpdir, err := ioutil.TempDir("", "sqlcipher_test")
 	if err != nil {
 		panic(err)
