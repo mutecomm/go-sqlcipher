@@ -2,7 +2,6 @@ package sqlite3_test
 
 import (
 	"database/sql"
-	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -15,21 +14,14 @@ var db *sql.DB
 
 func init() {
 	// create DB
-	var key = []byte("passphrase")
+	key := "2DD29CA851E7B56E4697B0E1F08507293D761A05CE4D1B628663F411A8086D99"
 	tmpdir, err := ioutil.TempDir("", "sqlcipher_test")
 	if err != nil {
 		panic(err)
 	}
 	dbname := filepath.Join(tmpdir, "sqlcipher_test")
+	dbname += fmt.Sprintf("?_pragma_key=%s&_pragma_cipher_page_size=4096", key)
 	db, err = sql.Open("sqlite3", dbname)
-	if err != nil {
-		panic(err)
-	}
-	_, err = db.Exec(fmt.Sprintf("PRAGMA key = \"x'%s'\";", hex.EncodeToString(key)))
-	if err != nil {
-		panic(err)
-	}
-	_, err = db.Exec("PRAGMA cipher_page_size = 4096;")
 	if err != nil {
 		panic(err)
 	}
@@ -44,14 +36,6 @@ CREATE TABLE KeyValueStore (
 	db.Close()
 	// open DB for testing
 	db, err = sql.Open("sqlite3", dbname)
-	if err != nil {
-		panic(err)
-	}
-	_, err = db.Exec(fmt.Sprintf("PRAGMA key = \"x'%s'\";", hex.EncodeToString(key)))
-	if err != nil {
-		panic(err)
-	}
-	_, err = db.Exec("PRAGMA cipher_page_size = 4096;")
 	if err != nil {
 		panic(err)
 	}

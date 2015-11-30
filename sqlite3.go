@@ -71,6 +71,7 @@ import "C"
 import (
 	"database/sql"
 	"database/sql/driver"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -279,6 +280,11 @@ func errorString(err Error) string {
 //   _txlock=XXX
 //     Specify locking behavior for transactions.  XXX can be "immediate",
 //     "deferred", "exclusive".
+// go-sqlcipher adds the following query parameters to those used by SQLite:
+//   _pragma_key=XXX
+//     Specify raw PRAGMA key (must be 64 character hex string).
+//   _pragma_cipher_page_size=XXX
+//     Set the PRAGMA cipher_page_size to adjust the page size.
 func (d *SQLiteDriver) Open(dsn string) (driver.Conn, error) {
 	if C.sqlite3_threadsafe() == 0 {
 		return nil, errors.New("sqlite library was not compiled for thread-safe operation")
@@ -288,8 +294,10 @@ func (d *SQLiteDriver) Open(dsn string) (driver.Conn, error) {
 	txlock := "BEGIN"
 	busy_timeout := 5000
 	pos := strings.IndexRune(dsn, '?')
+	var params url.Values
 	if pos >= 1 {
-		params, err := url.ParseQuery(dsn[pos+1:])
+		var err error
+		params, err = url.ParseQuery(dsn[pos+1:])
 		if err != nil {
 			return nil, err
 		}
@@ -355,6 +363,34 @@ func (d *SQLiteDriver) Open(dsn string) (driver.Conn, error) {
 	}
 
 	conn := &SQLiteConn{db: db, loc: loc, txlock: txlock}
+
+	// process SQLCipher pragmas encoded in dsn, if necessary
+	if params != nil {
+		// _pragma_key
+		if val := params.Get("_pragma_key"); val != "" {
+			if len(val) != 64 {
+				return nil, errors.New("sqlite3: _pragma_key doesn't have length 64")
+			}
+			if _, err := hex.DecodeString(val); err != nil {
+				return nil, fmt.Errorf("sqlite3: _pragma_key cannot be decoded: %s", err)
+			}
+			query := fmt.Sprintf("PRAGMA key = \"x'%s'\";", val)
+			if _, err := conn.Exec(query, nil); err != nil {
+				return nil, err
+			}
+		}
+		// _pragma_cipher_page_size
+		if val := params.Get("_pragma_cipher_page_size"); val != "" {
+			pageSize, err := strconv.Atoi(val)
+			if err != nil {
+				return nil, fmt.Errorf("sqlite3: _pragma_cipher_page_size cannot be parsed: %s", err)
+			}
+			query := fmt.Sprintf("PRAGMA cipher_page_size = %d;", pageSize)
+			if _, err := conn.Exec(query, nil); err != nil {
+				return nil, err
+			}
+		}
+	}
 
 	if d.ConnectHook != nil {
 		if err := d.ConnectHook(conn); err != nil {
