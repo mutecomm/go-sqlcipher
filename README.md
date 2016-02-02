@@ -1,4 +1,4 @@
-## go-sqlcipher [![GoDoc](https://godoc.org/github.com/mutecomm/go-sqlcipher?status.png)](http://godoc.org/github.com/mutecomm/go-sqlcipher) [![Build Status](https://travis-ci.org/mutecomm/go-sqlcipher.png)](https://travis-ci.org/mutecomm/go-sqlcipher)
+## go-sqlcipher [![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://godoc.org/github.com/mutecomm/go-sqlcipher) [![Build Status](http://img.shields.io/travis/mutecomm/go-sqlcipher.svg?style=flat-square)](https://travis-ci.org/mutecomm/go-sqlcipher)
 
 ### Description
 
