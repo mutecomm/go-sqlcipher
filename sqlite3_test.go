@@ -7,16 +7,18 @@ package sqlite3
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/url"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/mattn/go-sqlite3/sqlite3_test"
+	"github.com/mutecomm/go-sqlcipher/sqlite3_test"
 )
 
 func TempFilename(t *testing.T) string {
@@ -103,6 +105,35 @@ func TestReadonly(t *testing.T) {
 	}
 }
 
+func TestForeignKeys(t *testing.T) {
+	cases := map[string]bool{
+		"?_foreign_keys=1": true,
+		"?_foreign_keys=0": false,
+	}
+	for option, want := range cases {
+		fname := TempFilename(t)
+		uri := "file:" + fname + option
+		db, err := sql.Open("sqlite3", uri)
+		if err != nil {
+			os.Remove(fname)
+			t.Errorf("sql.Open(\"sqlite3\", %q): %v", uri, err)
+			continue
+		}
+		var enabled bool
+		err = db.QueryRow("PRAGMA foreign_keys;").Scan(&enabled)
+		db.Close()
+		os.Remove(fname)
+		if err != nil {
+			t.Errorf("query foreign_keys for %s: %v", uri, err)
+			continue
+		}
+		if enabled != want {
+			t.Errorf("\"PRAGMA foreign_keys;\" for %q = %t; want %t", uri, enabled, want)
+			continue
+		}
+	}
+}
+
 func TestClose(t *testing.T) {
 	tempFilename := TempFilename(t)
 	defer os.Remove(tempFilename)
@@ -164,7 +195,7 @@ func TestInsert(t *testing.T) {
 	var result int
 	rows.Scan(&result)
 	if result != 123 {
-		t.Errorf("Fetched %q; expected %q", 123, result)
+		t.Errorf("Expected %d for fetched result, but %d:", 123, result)
 	}
 }
 
@@ -203,12 +234,12 @@ func TestUpdate(t *testing.T) {
 	if err != nil {
 		t.Fatal("Failed to update record:", err)
 	}
-	lastId, err := res.LastInsertId()
+	lastID, err := res.LastInsertId()
 	if err != nil {
 		t.Fatal("Failed to get LastInsertId:", err)
 	}
-	if expected != lastId {
-		t.Errorf("Expected %q for last Id, but %q:", expected, lastId)
+	if expected != lastID {
+		t.Errorf("Expected %q for last Id, but %q:", expected, lastID)
 	}
 	affected, _ = res.RowsAffected()
 	if err != nil {
@@ -229,7 +260,7 @@ func TestUpdate(t *testing.T) {
 	var result int
 	rows.Scan(&result)
 	if result != 234 {
-		t.Errorf("Fetched %q; expected %q", 234, result)
+		t.Errorf("Expected %d for fetched result, but %d:", 234, result)
 	}
 }
 
@@ -268,12 +299,12 @@ func TestDelete(t *testing.T) {
 	if err != nil {
 		t.Fatal("Failed to delete record:", err)
 	}
-	lastId, err := res.LastInsertId()
+	lastID, err := res.LastInsertId()
 	if err != nil {
 		t.Fatal("Failed to get LastInsertId:", err)
 	}
-	if expected != lastId {
-		t.Errorf("Expected %q for last Id, but %q:", expected, lastId)
+	if expected != lastID {
+		t.Errorf("Expected %q for last Id, but %q:", expected, lastID)
 	}
 	affected, err = res.RowsAffected()
 	if err != nil {
@@ -989,42 +1020,6 @@ func TestVersion(t *testing.T) {
 	}
 }
 
-func TestNumberNamedParams(t *testing.T) {
-	tempFilename := TempFilename(t)
-	defer os.Remove(tempFilename)
-	db, err := sql.Open("sqlite3", tempFilename)
-	if err != nil {
-		t.Fatal("Failed to open database:", err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec(`
-	create table foo (id integer, name text, extra text);
-	`)
-	if err != nil {
-		t.Error("Failed to call db.Query:", err)
-	}
-
-	_, err = db.Exec(`insert into foo(id, name, extra) values($1, $2, $2)`, 1, "foo")
-	if err != nil {
-		t.Error("Failed to call db.Exec:", err)
-	}
-
-	row := db.QueryRow(`select id, extra from foo where id = $1 and extra = $2`, 1, "foo")
-	if row == nil {
-		t.Error("Failed to call db.QueryRow")
-	}
-	var id int
-	var extra string
-	err = row.Scan(&id, &extra)
-	if err != nil {
-		t.Error("Failed to db.Scan:", err)
-	}
-	if id != 1 || extra != "foo" {
-		t.Error("Failed to db.QueryRow: not matched results")
-	}
-}
-
 func TestStringContainingZero(t *testing.T) {
 	tempFilename := TempFilename(t)
 	defer os.Remove(tempFilename)
@@ -1081,6 +1076,10 @@ func (t TimeStamp) Scan(value interface{}) error {
 	return err
 }
 
+func (t TimeStamp) Value() (driver.Value, error) {
+	return t.Time.Format(CurrentTimeStamp), nil
+}
+
 func TestDateTimeNow(t *testing.T) {
 	tempFilename := TempFilename(t)
 	defer os.Remove(tempFilename)
@@ -1094,5 +1093,56 @@ func TestDateTimeNow(t *testing.T) {
 	err = db.QueryRow("SELECT datetime('now')").Scan(TimeStamp{&d})
 	if err != nil {
 		t.Fatal("Failed to scan datetime:", err)
+	}
+}
+
+func TestDeclTypes(t *testing.T) {
+
+	d := SQLiteDriver{}
+
+	conn, err := d.Open(":memory:")
+	if err != nil {
+		t.Fatal("Failed to begin transaction:", err)
+	}
+	defer conn.Close()
+
+	sqlite3conn := conn.(*SQLiteConn)
+
+	_, err = sqlite3conn.Exec("create table foo (id integer not null primary key, name text)", nil)
+	if err != nil {
+		t.Fatal("Failed to create table:", err)
+	}
+
+	_, err = sqlite3conn.Exec("insert into foo(name) values(\"bar\")", nil)
+	if err != nil {
+		t.Fatal("Failed to insert:", err)
+	}
+
+	rs, err := sqlite3conn.Query("select * from foo", nil)
+	if err != nil {
+		t.Fatal("Failed to select:", err)
+	}
+	defer rs.Close()
+
+	declTypes := rs.(*SQLiteRows).DeclTypes()
+
+	if !reflect.DeepEqual(declTypes, []string{"integer", "text"}) {
+		t.Fatal("Unexpected declTypes:", declTypes)
+	}
+}
+
+func TestPinger(t *testing.T) {
+	db, err := sql.Open("sqlite3", ":memory:")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = db.Ping()
+	if err != nil {
+		t.Fatal(err)
+	}
+	db.Close()
+	err = db.Ping()
+	if err == nil {
+		t.Fatal("Should be closed")
 	}
 }
