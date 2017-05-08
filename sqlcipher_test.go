@@ -51,7 +51,7 @@ var mapping = map[string]string{
 	"baz": "three",
 }
 
-func TestInsert(t *testing.T) {
+func TestSQLCipherParallelInsert(t *testing.T) {
 	t.Parallel()
 	insertValueQuery, err := db.Prepare("INSERT INTO KeyValueStore (KeyEntry, ValueEntry) VALUES (?, ?);")
 	if err != nil {
@@ -65,7 +65,7 @@ func TestInsert(t *testing.T) {
 	}
 }
 
-func TestSelect(t *testing.T) {
+func TestSQLCipherParallelSelect(t *testing.T) {
 	t.Parallel()
 	getValueQuery, err := db.Prepare("SELECT ValueEntry FROM KeyValueStore WHERE KeyEntry=?;")
 	if err != nil {
