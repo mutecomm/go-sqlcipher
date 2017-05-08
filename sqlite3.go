@@ -330,6 +330,11 @@ func errorString(err Error) string {
 //     "deferred", "exclusive".
 //   _foreign_keys=X
 //     Enable or disable enforcement of foreign keys.  X can be 1 or 0.
+// go-sqlcipher adds the following query parameters to those used by SQLite:
+//   _pragma_key=XXX
+//     Specify PRAGMA key.
+//   _pragma_cipher_page_size=XXX
+//     Set the PRAGMA cipher_page_size to adjust the page size.
 func (d *SQLiteDriver) Open(dsn string) (driver.Conn, error) {
 	if C.sqlite3_threadsafe() == 0 {
 		return nil, errors.New("sqlite library was not compiled for thread-safe operation")
@@ -340,8 +345,10 @@ func (d *SQLiteDriver) Open(dsn string) (driver.Conn, error) {
 	busyTimeout := 5000
 	foreignKeys := -1
 	pos := strings.IndexRune(dsn, '?')
+	var params url.Values
 	if pos >= 1 {
-		params, err := url.ParseQuery(dsn[pos+1:])
+		var err error
+		params, err = url.ParseQuery(dsn[pos+1:])
 		if err != nil {
 			return nil, err
 		}
@@ -437,6 +444,28 @@ func (d *SQLiteDriver) Open(dsn string) (driver.Conn, error) {
 		if err := exec("PRAGMA foreign_keys = ON;"); err != nil {
 			C.sqlite3_close_v2(db)
 			return nil, err
+		}
+	}
+
+	// process SQLCipher pragmas encoded in dsn, if necessary
+	if params != nil {
+		// _pragma_key
+		if val := params.Get("_pragma_key"); val != "" {
+			query := fmt.Sprintf("PRAGMA key = \"%s\";", val)
+			if err := exec(query); err != nil {
+				return nil, err
+			}
+		}
+		// _pragma_cipher_page_size
+		if val := params.Get("_pragma_cipher_page_size"); val != "" {
+			pageSize, err := strconv.Atoi(val)
+			if err != nil {
+				return nil, fmt.Errorf("sqlite3: _pragma_cipher_page_size cannot be parsed: %s", err)
+			}
+			query := fmt.Sprintf("PRAGMA cipher_page_size = %d;", pageSize)
+			if err := exec(query); err != nil {
+				return nil, err
+			}
 		}
 	}
 

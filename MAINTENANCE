@@ -15,7 +15,7 @@ Track files:
 
 error.go
 error_test.go
-sqlite3.go (dead code and extension loading coding removed)
+sqlite3.go (dead code and extension loading removed, sqlcipher pragmas added)
 sqlite3_other.go
 sqlite3_test.go (adjust path)
 sqlite3_windows.go
