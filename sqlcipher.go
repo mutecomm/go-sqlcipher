@@ -9,8 +9,9 @@ import (
 // sqlite3Header defines the header string used by SQLite 3.
 var sqlite3Header = []byte("SQLite format 3\000")
 
-// IsEncrypted returns true, if the file with filename is encrypted, false
-// otherwise. If the file cannot be read properly an error is returned.
+// IsEncrypted returns true, if the database with the given filename is
+// encrypted, and false otherwise.
+// If the database header cannot be read properly an error is returned.
 func IsEncrypted(filename string) (bool, error) {
 	// open file
 	db, err := os.Open(filename)
