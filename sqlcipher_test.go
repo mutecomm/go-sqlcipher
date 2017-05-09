@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -132,4 +133,41 @@ func TestSQLCipherIsEncryptedTrue(t *testing.T) {
 	if assert.NoError(t, err) {
 		assert.True(t, encrypted)
 	}
+}
+
+func ExampleIsEncrypted() {
+	// create random key
+	var key [32]byte
+	_, err := io.ReadFull(rand.Reader, key[:])
+	if err != nil {
+		log.Fatal(err)
+	}
+	// set DB name
+	dbname := "go-sqlcipher.sqlite"
+	dbnameWithDSN := dbname + fmt.Sprintf("?_pragma_key=x'%s'",
+		hex.EncodeToString(key[:]))
+	// create encrypted DB file
+	db, err := sql.Open("sqlite3", dbnameWithDSN)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer os.Remove(dbname)
+	defer db.Close()
+	// create table
+	_, err = db.Exec("CREATE TABLE t(x INTEGER);")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// make sure database is encrypted
+	encrypted, err := sqlite3.IsEncrypted(dbname)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if encrypted {
+		fmt.Println("DB is encrypted")
+	} else {
+		fmt.Println("DB is unencrypted")
+	}
+	// Output:
+	// DB is encrypted
 }
