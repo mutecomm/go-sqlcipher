@@ -5,16 +5,14 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
-#include "tomcrypt.h"
+#include "tomcrypt_private.h"
 
 /**
   @file crypt_register_prng.c
   Register a PRNG, Tom St Denis
 */
-  
+
 /**
    Register a PRNG with the descriptor table
    @param prng   The PRNG you wish to register
@@ -49,6 +47,6 @@ int register_prng(const struct ltc_prng_descriptor *prng)
    return -1;
 }
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */
