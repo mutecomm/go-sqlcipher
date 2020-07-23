@@ -1,5 +1,5 @@
 language: go
-go: 1.12
+go: 1.14
 before_install:
   - go get github.com/frankbraun/gocheck
   - go get -t github.com/mutecomm/go-sqlcipher
