@@ -9,19 +9,10 @@ tracked for changes (maintenance details below):
 Update code from https://github.com/mattn/go-sqlite3
 ----------------------------------------------------
 
-Current HEAD: cf7286f069c3ef596efcc87781a4653a2e7607bd
-(from 2017-04-08)
+Current HEAD: 4c2df3cc4614a8001c1afdebcbda0fcf6e045719
+(from 2020-07-21)
 
-Track files:
-
-error.go
-error_test.go
-sqlite3.go (dead code and extension loading removed, sqlcipher pragmas added)
-sqlite3_other.go
-sqlite3_test.go (adjust path)
-sqlite3_windows.go
-_example/simple/simple.go
-sqlite3_test/sqltest.go
+Use ./track_go-sqlite3.sh
 
 
 Update code from https://github.com/sqlcipher/sqlcipher
@@ -42,6 +33,6 @@ Update code from https://github.com/libtom/libtomcrypt
 ------------------------------------------------------
 
 Current HEAD: d8d7a83b34e0f37f78d206d45f3f058d14e905bb
-(from develop branch)
+(from develop branch, 2020-07-14)
 
 Use ./track_libtomcrypt.sh

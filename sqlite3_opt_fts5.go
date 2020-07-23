@@ -3,15 +3,12 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE file.
 
-// +build !windows
+// +build sqlite_fts5 fts5
 
 package sqlite3
 
 /*
-#cgo CFLAGS: -I.
-#cgo linux LDFLAGS: -ldl
-#cgo linux,ppc LDFLAGS: -lpthread
-#cgo linux,ppc64 LDFLAGS: -lpthread
-#cgo linux,ppc64le LDFLAGS: -lpthread
+#cgo CFLAGS: -DSQLITE_ENABLE_FTS5
+#cgo LDFLAGS: -lm
 */
 import "C"

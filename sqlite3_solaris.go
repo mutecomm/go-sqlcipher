@@ -3,15 +3,12 @@
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE file.
 
-// +build !windows
+// +build solaris
 
 package sqlite3
 
 /*
-#cgo CFLAGS: -I.
-#cgo linux LDFLAGS: -ldl
-#cgo linux,ppc LDFLAGS: -lpthread
-#cgo linux,ppc64 LDFLAGS: -lpthread
-#cgo linux,ppc64le LDFLAGS: -lpthread
+#cgo CFLAGS: -D__EXTENSIONS__=1
+#cgo LDFLAGS: -lc
 */
 import "C"

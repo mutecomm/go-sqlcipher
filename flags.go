@@ -1,6 +1,9 @@
 package sqlite3
 
 /*
+// make go-sqlite3 use embedded library without code changes
+#cgo CFLAGS: -DUSE_LIBSQLITE3
+
 // enable encryption codec in sqlite
 #cgo CFLAGS: -DSQLITE_HAS_CODEC
 
@@ -9,9 +12,6 @@ package sqlite3
 
 // use libtomcrypt implementation in sqlcipher
 #cgo CFLAGS: -DSQLCIPHER_CRYPTO_LIBTOMCRYPT
-
-// disable loadable extensions in sqlite
-#cgo CFLAGS: -DSQLITE_OMIT_LOAD_EXTENSION=1
 
 // disable anything "not portable" in libtomcrypt
 #cgo CFLAGS: -DLTC_NO_ASM
