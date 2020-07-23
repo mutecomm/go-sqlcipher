@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	sqlite3 "github.com/mutecomm/go-sqlcipher"
+	sqlite3 "github.com/mutecomm/go-sqlcipher/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -23,6 +23,10 @@ to upgrade existing database files.
 
 See [migrating databases](https://www.zetetic.net/sqlcipher/sqlcipher-api/#Migrating_Databases) for details.
 
+To upgrade your Go code to the 4.x series, change the import path to
+
+    "github.com/mutecomm/go-sqlcipher/v4"
+
 ### Installation
 
 This package can be installed with the go get command:
