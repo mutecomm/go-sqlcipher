@@ -11,8 +11,17 @@ conforming to the built-in database/sql interface. It is based on:
 
 SQLite itself is part of SQLCipher.
 
-go-sqlcipher currently only supports the SQLCipher 3.x releases.
+### Incompatibilities of SQLCipher
 
+The version tags of go-sqlcipher are the same as for SQLCipher.
+
+**SQLCipher 4.x is incompatible with SQLCipher 3.x!**
+
+go-sqlcipher does not implement any migration strategies at the moment.
+So if you upgrade a major version of go-sqlcipher, you yourself are responsible
+to upgrade existing database files.
+
+See [migrating databases](https://www.zetetic.net/sqlcipher/sqlcipher-api/#Migrating_Databases) for details.
 
 ### Installation
 

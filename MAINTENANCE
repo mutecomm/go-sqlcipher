@@ -26,7 +26,7 @@ sqlite3_test/sqltest.go
 Update code from https://github.com/sqlcipher/sqlcipher
 -------------------------------------------------------
 
-Current release: v3.4.2
+Current release: v4.4.0
 
 Execute:
 ./configure
@@ -40,51 +40,7 @@ sqlite3.c
 Update code from https://github.com/libtom/libtomcrypt
 ------------------------------------------------------
 
-Current HEAD: bd7933cc2b43ebe7c4349614c6cf1271251ebee4
+Current HEAD: d8d7a83b34e0f37f78d206d45f3f058d14e905bb
+(from develop branch)
 
-Track header files:
-
-tomcrypt_argchk.h
-tomcrypt_cfg.h
-tomcrypt_cipher.h
-tomcrypt_custom.h (modified)
-tomcrypt.h
-tomcrypt_hash.h
-tomcrypt_mac.h
-tomcrypt_macros.h
-tomcrypt_math.h
-tomcrypt_misc.h
-tomcrypt_pkcs.h
-tomcrypt_pk.h
-tomcrypt_prng.h
-
-Track C files:
-
-aes.c (modified include "aes_tab.h" instead of "aes_tab.c")
-aes_tab.c (renamed to aes_tab.h)
-burn_stack.c
-cbc_decrypt.c
-cbc_done.c
-cbc_encrypt.c
-cbc_start.c
-crypt_argchk.c
-crypt_cipher_descriptor.c
-crypt_cipher_is_valid.c
-crypt_find_cipher.c
-crypt_find_hash.c
-crypt_hash_descriptor.c
-crypt_hash_is_valid.c
-crypt_prng_descriptor.c
-crypt_register_cipher.c
-crypt_register_hash.c
-crypt_register_prng.c
-fortuna.c
-hash_memory.c
-hmac_done.c
-hmac_init.c
-hmac_memory.c
-hmac_process.c
-pkcs_5_2.c
-sha1.c
-sha256.c
-zeromem.c
+Use ./track_libtomcrypt.sh

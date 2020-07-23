@@ -22,12 +22,14 @@ cp -f $ltd/src/headers/tomcrypt_math.h .
 cp -f $ltd/src/headers/tomcrypt_misc.h .
 cp -f $ltd/src/headers/tomcrypt_pkcs.h .
 cp -f $ltd/src/headers/tomcrypt_pk.h .
+cp -f $ltd/src/headers/tomcrypt_private.h .
 cp -f $ltd/src/headers/tomcrypt_prng.h .
 
 # copy C files
 cp -f $ltd/src/ciphers/aes/aes.c .
 cp -f $ltd/src/ciphers/aes/aes_tab.c aes_tab.h
 cp -f $ltd/src/misc/burn_stack.c .
+cp -f $ltd/src/misc/compare_testvector.c .
 cp -f $ltd/src/modes/cbc/cbc_decrypt.c .
 cp -f $ltd/src/modes/cbc/cbc_done.c .
 cp -f $ltd/src/modes/cbc/cbc_encrypt.c .
@@ -52,7 +54,7 @@ cp -f $ltd/src/mac/hmac/hmac_process.c .
 cp -f $ltd/src/misc/pkcs5/pkcs_5_2.c .
 cp -f $ltd/src/hashes/sha1.c .
 cp -f $ltd/src/hashes/sha2/sha256.c .
+cp -f $ltd/src/hashes/sha2/sha512.c .
 cp -f $ltd/src/misc/zeromem.c .
 
-echo "check modifications to tomcrypt_custom.h (was modified by us)!"
-echo "make sure aes.s includes aes.tab.h instead of aes_tab.c!"
+echo "make sure aes.c includes aes_tab.h instead of aes_tab.c!"

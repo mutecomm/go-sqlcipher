@@ -1,21 +1,13 @@
-/* LibTomCrypt, modular cryptographic library -- Tom St Denis
- *
- * LibTomCrypt is a library that provides various cryptographic
- * algorithms in a highly modular and flexible manner.
- *
- * The library is free for all purposes without any express
- * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
- */
-#include "tomcrypt.h"
+/* LibTomCrypt, modular cryptographic library -- Tom St Denis */
+/* SPDX-License-Identifier: Unlicense */
+#include "tomcrypt_private.h"
 
 /**
   @file sha256.c
-  LTC_SHA256 by Tom St Denis 
+  LTC_SHA256 by Tom St Denis
 */
 
-#ifdef LTC_SHA256 
+#ifdef LTC_SHA256
 
 const struct ltc_hash_descriptor sha256_desc =
 {
@@ -27,7 +19,7 @@ const struct ltc_hash_descriptor sha256_desc =
     /* OID */
    { 2, 16, 840, 1, 101, 3, 4, 2, 1,  },
    9,
-    
+
     &sha256_init,
     &sha256_process,
     &sha256_done,
@@ -56,7 +48,7 @@ static const ulong32 K[64] = {
 
 /* Various logical functions */
 #define Ch(x,y,z)       (z ^ (x & (y ^ z)))
-#define Maj(x,y,z)      (((x | y) & z) | (x & y)) 
+#define Maj(x,y,z)      (((x | y) & z) | (x & y))
 #define S(x, n)         RORc((x),(n))
 #define R(x, n)         (((x)&0xFFFFFFFFUL)>>(n))
 #define Sigma0(x)       (S(x, 2) ^ S(x, 13) ^ S(x, 22))
@@ -66,9 +58,9 @@ static const ulong32 K[64] = {
 
 /* compress 512-bits */
 #ifdef LTC_CLEAN_STACK
-static int _sha256_compress(hash_state * md, unsigned char *buf)
+static int _sha256_compress(hash_state * md, const unsigned char *buf)
 #else
-static int  sha256_compress(hash_state * md, unsigned char *buf)
+static int  sha256_compress(hash_state * md, const unsigned char *buf)
 #endif
 {
     ulong32 S[8], W[64], t0, t1;
@@ -90,10 +82,10 @@ static int  sha256_compress(hash_state * md, unsigned char *buf)
     /* fill W[16..63] */
     for (i = 16; i < 64; i++) {
         W[i] = Gamma1(W[i - 2]) + W[i - 7] + Gamma0(W[i - 15]) + W[i - 16];
-    }        
+    }
 
     /* Compress */
-#ifdef LTC_SMALL_CODE   
+#ifdef LTC_SMALL_CODE
 #define RND(a,b,c,d,e,f,g,h,i)                         \
      t0 = h + Sigma1(e) + Ch(e, f, g) + K[i] + W[i];   \
      t1 = Sigma0(a) + Maj(a, b, c);                    \
@@ -102,10 +94,10 @@ static int  sha256_compress(hash_state * md, unsigned char *buf)
 
      for (i = 0; i < 64; ++i) {
          RND(S[0],S[1],S[2],S[3],S[4],S[5],S[6],S[7],i);
-         t = S[7]; S[7] = S[6]; S[6] = S[5]; S[5] = S[4]; 
+         t = S[7]; S[7] = S[6]; S[6] = S[5]; S[5] = S[4];
          S[4] = S[3]; S[3] = S[2]; S[2] = S[1]; S[1] = S[0]; S[0] = t;
-     }  
-#else 
+     }
+#else
 #define RND(a,b,c,d,e,f,g,h,i,ki)                    \
      t0 = h + Sigma1(e) + Ch(e, f, g) + ki + W[i];   \
      t1 = Sigma0(a) + Maj(a, b, c);                  \
@@ -177,9 +169,9 @@ static int  sha256_compress(hash_state * md, unsigned char *buf)
     RND(S[2],S[3],S[4],S[5],S[6],S[7],S[0],S[1],62,0xbef9a3f7);
     RND(S[1],S[2],S[3],S[4],S[5],S[6],S[7],S[0],63,0xc67178f2);
 
-#undef RND     
-    
-#endif     
+#undef RND
+
+#endif
 
     /* feedback */
     for (i = 0; i < 8; i++) {
@@ -189,7 +181,7 @@ static int  sha256_compress(hash_state * md, unsigned char *buf)
 }
 
 #ifdef LTC_CLEAN_STACK
-static int sha256_compress(hash_state * md, unsigned char *buf)
+static int sha256_compress(hash_state * md, const unsigned char *buf)
 {
     int err;
     err = _sha256_compress(md, buf);
@@ -287,14 +279,14 @@ int sha256_done(hash_state * md, unsigned char *out)
 /**
   Self-test the hash
   @return CRYPT_OK if successful, CRYPT_NOP if self-tests have been disabled
-*/  
+*/
 int  sha256_test(void)
 {
  #ifndef LTC_TEST
     return CRYPT_NOP;
- #else    
+ #else
   static const struct {
-      char *msg;
+      const char *msg;
       unsigned char hash[32];
   } tests[] = {
     { "abc",
@@ -304,9 +296,9 @@ int  sha256_test(void)
         0xb4, 0x10, 0xff, 0x61, 0xf2, 0x00, 0x15, 0xad }
     },
     { "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
-      { 0x24, 0x8d, 0x6a, 0x61, 0xd2, 0x06, 0x38, 0xb8, 
+      { 0x24, 0x8d, 0x6a, 0x61, 0xd2, 0x06, 0x38, 0xb8,
         0xe5, 0xc0, 0x26, 0x93, 0x0c, 0x3e, 0x60, 0x39,
-        0xa3, 0x3c, 0xe4, 0x59, 0x64, 0xff, 0x21, 0x67, 
+        0xa3, 0x3c, 0xe4, 0x59, 0x64, 0xff, 0x21, 0x67,
         0xf6, 0xec, 0xed, 0xd4, 0x19, 0xdb, 0x06, 0xc1 }
     },
   };
@@ -317,9 +309,9 @@ int  sha256_test(void)
 
   for (i = 0; i < (int)(sizeof(tests) / sizeof(tests[0])); i++) {
       sha256_init(&md);
-      sha256_process(&md, (unsigned char*)tests[i].msg, (unsigned long)strlen(tests[i].msg));
+      sha256_process(&md, (unsigned char*)tests[i].msg, (unsigned long)XSTRLEN(tests[i].msg));
       sha256_done(&md, tmp);
-      if (XMEMCMP(tmp, tests[i].hash, 32) != 0) {
+      if (compare_testvector(tmp, sizeof(tmp), tests[i].hash, sizeof(tests[i].hash), "SHA256", i)) {
          return CRYPT_FAIL_TESTVECTOR;
       }
   }
@@ -327,14 +319,6 @@ int  sha256_test(void)
  #endif
 }
 
-#ifdef LTC_SHA224
-#include "sha224.c"
-#endif
-
 #endif
 
 
-
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */

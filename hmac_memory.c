@@ -1,36 +1,28 @@
-/* LibTomCrypt, modular cryptographic library -- Tom St Denis
- *
- * LibTomCrypt is a library that provides various cryptographic
- * algorithms in a highly modular and flexible manner.
- *
- * The library is free for all purposes without any express
- * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
- */
-#include "tomcrypt.h"
+/* LibTomCrypt, modular cryptographic library -- Tom St Denis */
+/* SPDX-License-Identifier: Unlicense */
+#include "tomcrypt_private.h"
 
 /**
   @file hmac_memory.c
-  LTC_HMAC support, process a block of memory, Tom St Denis/Dobes Vandermeer
+  HMAC support, process a block of memory, Tom St Denis/Dobes Vandermeer
 */
 
 #ifdef LTC_HMAC
 
 /**
-   LTC_HMAC a block of memory to produce the authentication tag
-   @param hash      The index of the hash to use 
-   @param key       The secret key 
+   HMAC a block of memory to produce the authentication tag
+   @param hash      The index of the hash to use
+   @param key       The secret key
    @param keylen    The length of the secret key (octets)
-   @param in        The data to LTC_HMAC
-   @param inlen     The length of the data to LTC_HMAC (octets)
+   @param in        The data to HMAC
+   @param inlen     The length of the data to HMAC (octets)
    @param out       [out] Destination of the authentication tag
    @param outlen    [in/out] Max size and resulting size of authentication tag
    @return CRYPT_OK if successful
 */
-int hmac_memory(int hash, 
+int hmac_memory(int hash,
                 const unsigned char *key,  unsigned long keylen,
-                const unsigned char *in,   unsigned long inlen, 
+                const unsigned char *in,   unsigned long inlen,
                       unsigned char *out,  unsigned long *outlen)
 {
     hmac_state *hmac;
@@ -38,7 +30,7 @@ int hmac_memory(int hash,
 
     LTC_ARGCHK(key    != NULL);
     LTC_ARGCHK(in     != NULL);
-    LTC_ARGCHK(out    != NULL); 
+    LTC_ARGCHK(out    != NULL);
     LTC_ARGCHK(outlen != NULL);
 
     /* make sure hash descriptor is valid */
@@ -77,12 +69,8 @@ LBL_ERR:
 #endif
 
    XFREE(hmac);
-   return err;   
+   return err;
 }
 
 #endif
 
-
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */

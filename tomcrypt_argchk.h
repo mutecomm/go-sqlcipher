@@ -1,13 +1,17 @@
+/* LibTomCrypt, modular cryptographic library -- Tom St Denis */
+/* SPDX-License-Identifier: Unlicense */
+
 /* Defines the LTC_ARGCHK macro used within the library */
-/* ARGTYPE is defined in mycrypt_cfg.h */
+/* ARGTYPE is defined in tomcrypt_cfg.h */
+
+/* ARGTYPE is per default defined to 0  */
 #if ARGTYPE == 0
 
 #include <signal.h>
 
-/* this is the default LibTomCrypt macro  */
-void crypt_argchk(char *v, char *s, int d);
-#define LTC_ARGCHK(x) if (!(x)) { crypt_argchk(#x, __FILE__, __LINE__); }
-#define LTC_ARGCHKVD(x) LTC_ARGCHK(x)
+LTC_NORETURN void crypt_argchk(const char *v, const char *s, int d);
+#define LTC_ARGCHK(x) do { if (!(x)) { crypt_argchk(#x, __FILE__, __LINE__); } }while(0)
+#define LTC_ARGCHKVD(x) do { if (!(x)) { crypt_argchk(#x, __FILE__, __LINE__); } }while(0)
 
 #elif ARGTYPE == 1
 
@@ -22,7 +26,7 @@ void crypt_argchk(char *v, char *s, int d);
 
 #elif ARGTYPE == 3
 
-#define LTC_ARGCHK(x) 
+#define LTC_ARGCHK(x) LTC_UNUSED_PARAM(x)
 #define LTC_ARGCHKVD(x) LTC_ARGCHK(x)
 
 #elif ARGTYPE == 4
@@ -32,7 +36,3 @@ void crypt_argchk(char *v, char *s, int d);
 
 #endif
 
-
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
