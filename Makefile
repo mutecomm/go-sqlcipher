@@ -1,4 +1,4 @@
-.PHONY: all update-modules
+.PHONY: all test update-modules
 
 all:
 	env GO111MODULE=on go build -v ./...
