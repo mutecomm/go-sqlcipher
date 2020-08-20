@@ -19,5 +19,5 @@ cp -r $ltd/_example .
 rm -rf upgrade
 cp -r $ltd/upgrade .
 
-echo "make sure to adjust sqlite3.go adjusted with sqlcipher pragmas!"
+echo "make sure to adjust sqlite3.go with sqlcipher pragmas!"
 echo "make sure to adjust import paths in _example directory!"
