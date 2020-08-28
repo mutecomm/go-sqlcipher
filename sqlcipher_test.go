@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"testing"
@@ -30,7 +31,7 @@ CREATE TABLE KeyValueStore (
 
 func init() {
 	// create DB
-	key := "passphrase"
+	key := url.QueryEscape("passphrase")
 	tmpdir, err := ioutil.TempDir("", testDir)
 	if err != nil {
 		panic(err)
