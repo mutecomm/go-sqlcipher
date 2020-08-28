@@ -3,13 +3,14 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"net/url"
 	"os"
 
 	_ "github.com/mutecomm/go-sqlcipher/v4"
 )
 
 func selectFromDB(dbname, password string) error {
-	dbnameWithDSN := dbname + fmt.Sprintf("?_pragma_key=%s&_pragma_cipher_page_size=4096", password)
+	dbnameWithDSN := dbname + fmt.Sprintf("?_pragma_key=%s&_pragma_cipher_page_size=4096", url.QueryEscape(password))
 	db, err := sql.Open("sqlite3", dbnameWithDSN)
 	if err != nil {
 		return err

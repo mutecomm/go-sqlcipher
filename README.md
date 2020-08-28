@@ -50,6 +50,17 @@ db, _ := sql.Open("sqlite3", dbname)
 `_pragma_cipher_page_size` is the page size of the encrypted database (set if
 you want a different value than the default size).
 
+```go
+key := url.QueryEscape("secret")
+dbname := fmt.Sprintf("db?_pragma_key=%s&_pragma_cipher_page_size=4096", key)
+db, _ := sql.Open("sqlite3", dbname)
+```
+
+This uses a passphrase directly as `_pragma_key` with the key derivation function in
+SQLCipher. Do not forget the `url.QueryEscape()` call in your code!
+
+See also [PRAGMA key](https://www.zetetic.net/sqlcipher/sqlcipher-api/#PRAGMA_key).
+
 API documentation can be found here:
 http://godoc.org/github.com/mutecomm/go-sqlcipher
 
