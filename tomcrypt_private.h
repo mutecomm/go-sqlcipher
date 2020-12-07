@@ -90,7 +90,7 @@ int func_name (hash_state * md, const unsigned char *in, unsigned long inlen)   
     if (md-> state_var .curlen > sizeof(md-> state_var .buf)) {                             \
        return CRYPT_INVALID_ARG;                                                            \
     }                                                                                       \
-    if ((md-> state_var .length + inlen) < md-> state_var .length) {                        \
+    if ((md-> state_var .length + inlen * 8) < md-> state_var .length) {                        \
       return CRYPT_HASH_OVERFLOW;                                                           \
     }                                                                                       \
     while (inlen > 0) {                                                                     \
@@ -417,7 +417,7 @@ int pkcs12_kdf(               int   hash_id,
 
 /* tomcrypt_prng.h */
 
-#define _LTC_PRNG_EXPORT(which) \
+#define LTC_PRNG_EXPORT(which) \
 int which ## _export(unsigned char *out, unsigned long *outlen, prng_state *prng)      \
 {                                                                                      \
    unsigned long len = which ## _desc.export_size;                                     \

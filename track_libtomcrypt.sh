@@ -3,7 +3,7 @@
 if [ $# -ne 1 ]
 then
   echo "Usage: $0 libtomcrypt_dir" >&2
-  echo "Copy tracked source files from libtomdcrypt_dir to current directory." >&2
+  echo "Copy tracked source files from libtomcrypt_dir to current directory." >&2
   exit 1
 fi
 
