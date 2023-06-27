@@ -93,7 +93,7 @@ const char *error_to_string(int err);
 extern const char *crypt_build_settings;
 
 /* ---- HMM ---- */
-int crypt_fsa(void *mp, ...);
+int crypt_fsa(void *mp, ...) LTC_NULL_TERMINATED;
 
 /* ---- Dynamic language support ---- */
 int crypt_get_constant(const char* namein, int *valueout);
@@ -146,6 +146,10 @@ enum padding_type {
    LTC_PAD_ISO_10126    = 0x1000U,
 #endif
    LTC_PAD_ANSI_X923    = 0x2000U,
+   LTC_PAD_SSH          = 0x3000U,
+   /* The following padding modes don't contain the padding
+    * length as last byte of the padding.
+    */
    LTC_PAD_ONE_AND_ZERO = 0x8000U,
    LTC_PAD_ZERO         = 0x9000U,
    LTC_PAD_ZERO_ALWAYS  = 0xA000U,
@@ -168,8 +172,8 @@ typedef enum ssh_data_type_ {
 } ssh_data_type;
 
 /* VA list handy helpers with tuples of <type, data> */
-int ssh_encode_sequence_multi(unsigned char *out, unsigned long *outlen, ...);
-int ssh_decode_sequence_multi(const unsigned char *in, unsigned long *inlen, ...);
+int ssh_encode_sequence_multi(unsigned char *out, unsigned long *outlen, ...) LTC_NULL_TERMINATED;
+int ssh_decode_sequence_multi(const unsigned char *in, unsigned long *inlen, ...) LTC_NULL_TERMINATED;
 #endif /* LTC_SSH */
 
 int compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);

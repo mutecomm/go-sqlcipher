@@ -9,17 +9,25 @@
 
 #define LTC_PAD_MASK       (0xF000U)
 
+/* `NULL` as defined by the standard is not guaranteed to be of a pointer
+ * type. In order to make sure that in vararg API's a pointer type is used,
+ * define our own version and use that one internally.
+ */
+#ifndef LTC_NULL
+   #define LTC_NULL ((void *)0)
+#endif
+
 /*
  * Internal Enums
  */
 
 enum ltc_oid_id {
-   PKA_RSA,
-   PKA_DSA,
-   PKA_EC,
-   PKA_EC_PRIMEF,
-   PKA_X25519,
-   PKA_ED25519,
+   LTC_OID_RSA,
+   LTC_OID_DSA,
+   LTC_OID_EC,
+   LTC_OID_EC_PRIMEF,
+   LTC_OID_X25519,
+   LTC_OID_ED25519,
 };
 
 /*
@@ -69,6 +77,10 @@ typedef struct
 
 /* tomcrypt_cipher.h */
 
+#if defined(LTC_AES_NI) && defined(LTC_AMD64_SSE4_1)
+#define LTC_HAS_AES_NI
+#endif
+
 void blowfish_enc(ulong32 *data, unsigned long blocks, const symmetric_key *skey);
 int blowfish_expand(const unsigned char *key, int keylen,
                     const unsigned char *data, int datalen,
@@ -90,7 +102,8 @@ int func_name (hash_state * md, const unsigned char *in, unsigned long inlen)   
     if (md-> state_var .curlen > sizeof(md-> state_var .buf)) {                             \
        return CRYPT_INVALID_ARG;                                                            \
     }                                                                                       \
-    if ((md-> state_var .length + inlen * 8) < md-> state_var .length) {                        \
+    if (((md-> state_var .length + inlen * 8) < md-> state_var .length)                     \
+          || ((inlen * 8) < inlen)) {                                                       \
       return CRYPT_HASH_OVERFLOW;                                                           \
     }                                                                                       \
     while (inlen > 0) {                                                                     \
@@ -202,6 +215,17 @@ void ocb3_int_xor_blocks(unsigned char *out, const unsigned char *block_a, const
 
 /* tomcrypt_misc.h */
 
+typedef enum {
+   /** Use `\r\n` as line separator */
+   BASE64_PEM_CRLF = 1,
+   /** Create output with 72 chars line length */
+   BASE64_PEM_SSH = 2,
+} base64_pem_flags;
+
+int base64_encode_pem(const unsigned char *in,  unsigned long inlen,
+                                     char *out, unsigned long *outlen,
+                            unsigned int  flags);
+
 void copy_or_zeromem(const unsigned char* src, unsigned char* dest, unsigned long len, int coz);
 
 int pbes_decrypt(const pbes_arg  *arg, unsigned char *dec_data, unsigned long *dec_size);
@@ -223,6 +247,9 @@ int pk_oid_num_to_str(const unsigned long *oid, unsigned long oidlen, char *OID,
 #ifdef LTC_MRSA
 int rsa_init(rsa_key *key);
 void rsa_shrink_key(rsa_key *key);
+int rsa_make_key_bn_e(prng_state *prng, int wprng, int size, void *e,
+                      rsa_key *key); /* used by op-tee */
+int rsa_import_pkcs1(const unsigned char *in, unsigned long inlen, rsa_key *key);
 #endif /* LTC_MRSA */
 
 /* ---- DH Routines ---- */
@@ -316,16 +343,19 @@ int dsa_int_validate_primes(const dsa_key *key, int *stat);
 int tweetnacl_crypto_sign(
   unsigned char *sm,unsigned long long *smlen,
   const unsigned char *m,unsigned long long mlen,
-  const unsigned char *sk, const unsigned char *pk);
+  const unsigned char *sk,const unsigned char *pk,
+  const unsigned char *ctx,unsigned long long cs);
 int tweetnacl_crypto_sign_open(
   int *stat,
   unsigned char *m,unsigned long long *mlen,
   const unsigned char *sm,unsigned long long smlen,
+  const unsigned char *ctx, unsigned long long cs,
   const unsigned char *pk);
 int tweetnacl_crypto_sign_keypair(prng_state *prng, int wprng, unsigned char *pk,unsigned char *sk);
 int tweetnacl_crypto_sk_to_pk(unsigned char *pk, const unsigned char *sk);
 int tweetnacl_crypto_scalarmult(unsigned char *q, const unsigned char *n, const unsigned char *p);
 int tweetnacl_crypto_scalarmult_base(unsigned char *q,const unsigned char *n);
+int tweetnacl_crypto_ph(unsigned char *out, const unsigned char *msg, unsigned long long msglen);
 
 typedef int (*sk_to_pk)(unsigned char *pk ,const unsigned char *sk);
 int ec25519_import_pkcs8(const unsigned char *in, unsigned long inlen,
@@ -335,6 +365,9 @@ int ec25519_import_pkcs8(const unsigned char *in, unsigned long inlen,
 int ec25519_export(       unsigned char *out, unsigned long *outlen,
                                     int  which,
                    const curve25519_key *key);
+int ec25519_crypto_ctx(      unsigned char *out, unsigned long *outlen,
+                             unsigned char flag,
+                       const unsigned char *ctx, unsigned long  ctxlen);
 #endif /* LTC_CURVE25519 */
 
 #ifdef LTC_DER
@@ -363,7 +396,8 @@ extern const unsigned long  der_asn1_tag_to_type_map_sz;
 extern const int der_asn1_type_to_identifier_map[];
 extern const unsigned long der_asn1_type_to_identifier_map_sz;
 
-int der_decode_sequence_multi_ex(const unsigned char *in, unsigned long inlen, unsigned int flags, ...);
+int der_decode_sequence_multi_ex(const unsigned char *in, unsigned long inlen, unsigned int flags, ...)
+                                 LTC_NULL_TERMINATED;
 
 int der_teletex_char_encode(int c);
 int der_teletex_value_decode(int v);
