@@ -9,7 +9,7 @@ tracked for changes (maintenance details below):
 Update code from https://github.com/mattn/go-sqlite3
 ----------------------------------------------------
 
-Current release: v1.14.5
+Current release: v1.14.16
 
 Use ./track_go-sqlite3.sh
 
