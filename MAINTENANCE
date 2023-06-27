@@ -17,7 +17,7 @@ Use ./track_go-sqlite3.sh
 Update code from https://github.com/sqlcipher/sqlcipher
 -------------------------------------------------------
 
-Current release: v4.4.2
+Current release: v4.5.4
 
 Execute:
 ./configure
