@@ -114,7 +114,7 @@
 
    #define LTC_NO_MISC
    #define LTC_BASE64
-#endif
+#endif /* LTC_EASY */
 
 /* The minimal set of functionality to run the tests */
 #ifdef LTC_MINIMAL
@@ -129,7 +129,7 @@
    #define LTC_TRY_URANDOM_FIRST
 
    #undef LTC_NO_FILE
-#endif
+#endif /* LTC_MINIMAL */
 
 /* Enable self-test test vector checking */
 #ifndef LTC_NO_TEST
@@ -179,6 +179,7 @@
 #define LTC_RC6
 #define LTC_SAFERP
 #define LTC_RIJNDAEL
+#define LTC_AES_NI
 #define LTC_XTEA
 /* _TABLES tells it to use tables during setup, _SMALL means to use the smaller scheduled key format
  * (saves 4KB of ram), _ALL_TABLES enables all tables during setup */
@@ -357,7 +358,7 @@
   #define LTC_YARROW_AES 2
 #endif
 
-#endif
+#endif /* LTC_YARROW */
 
 #ifdef LTC_FORTUNA
 
@@ -553,7 +554,7 @@
    #define LTC_ECC_SECP384R1
    #define LTC_ECC_SECP521R1
 #endif
-#endif
+#endif /* LTC_MECC */
 
 #if defined(LTC_DER)
    #ifndef LTC_DER_MAX_RECURSION
@@ -583,6 +584,11 @@
 #ifdef LTC_PKCS_8
    #define LTC_PADDING
    #define LTC_PBES
+#endif
+
+#if defined(LTC_CLEAN_STACK)
+/* if you're sure that you want to use it, remove the line below */
+   #error LTC_CLEAN_STACK is considered as broken
 #endif
 
 #if defined(LTC_PBES) && !defined(LTC_PKCS_5)
@@ -685,14 +691,12 @@
 #define LTC_MUTEX_UNLOCK(x)
 #define LTC_MUTEX_DESTROY(x)
 
-#endif
+#endif /* LTC_PTHREAD */
 
 /* Debuggers */
 
 /* define this if you use Valgrind, note: it CHANGES the way SOBER-128 and RC4 work (see the code) */
 /* #define LTC_VALGRIND */
-
-#endif
 
 #ifndef LTC_NO_FILE
    /* buffer size for reading from a file via fread(..) */
@@ -734,3 +738,5 @@
 #define LTC_ECC_SECP521R1
 #undef LTC_ECC521
 #endif
+
+#endif /* TOMCRYPT_CUSTOM_H_ */

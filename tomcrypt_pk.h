@@ -45,7 +45,8 @@ typedef struct Rsa_key {
 } rsa_key;
 
 int rsa_make_key(prng_state *prng, int wprng, int size, long e, rsa_key *key);
-
+int rsa_make_key_ubin_e(prng_state *prng, int wprng, int size,
+                        const unsigned char *e, unsigned long elen, rsa_key *key);
 int rsa_get_size(const rsa_key *key);
 
 int rsa_exptmod(const unsigned char *in,   unsigned long inlen,
@@ -354,13 +355,31 @@ int ed25519_import_pkcs8(const unsigned char *in, unsigned long inlen,
                                   const void *pwd, unsigned long pwdlen,
                               curve25519_key *key);
 
-int ed25519_sign(const unsigned char  *msg, unsigned long msglen,
-                       unsigned char  *sig, unsigned long *siglen,
+int ed25519_sign(const  unsigned char *msg, unsigned long msglen,
+                        unsigned char *sig, unsigned long *siglen,
                  const curve25519_key *private_key);
-
+int ed25519ctx_sign(const  unsigned char *msg, unsigned long  msglen,
+                           unsigned char *sig, unsigned long *siglen,
+                    const  unsigned char *ctx, unsigned long  ctxlen,
+                    const curve25519_key *private_key);
+int ed25519ph_sign(const  unsigned char *msg, unsigned long  msglen,
+                          unsigned char *sig, unsigned long *siglen,
+                   const  unsigned char *ctx, unsigned long  ctxlen,
+                   const curve25519_key *private_key);
 int ed25519_verify(const  unsigned char *msg, unsigned long msglen,
                    const  unsigned char *sig, unsigned long siglen,
-                   int *stat, const curve25519_key *public_key);
+                                    int *stat,
+                   const curve25519_key *public_key);
+int ed25519ctx_verify(const  unsigned char *msg, unsigned long msglen,
+                      const  unsigned char *sig, unsigned long siglen,
+                      const  unsigned char *ctx, unsigned long ctxlen,
+                                       int *stat,
+                      const curve25519_key *public_key);
+int ed25519ph_verify(const  unsigned char *msg, unsigned long msglen,
+                     const  unsigned char *sig, unsigned long siglen,
+                     const  unsigned char *ctx, unsigned long ctxlen,
+                                      int *stat,
+                     const curve25519_key *public_key);
 
 /** X25519 Key-Exchange API */
 int x25519_make_key(prng_state *prng, int wprng, curve25519_key *key);
@@ -384,11 +403,14 @@ int x25519_shared_secret(const curve25519_key *private_key,
 
 #ifdef LTC_MDSA
 
-/* Max diff between group and modulus size in bytes */
-#define LTC_MDSA_DELTA     512
+/* Max diff between group and modulus size in bytes (max case: L=8192bits, N=256bits) */
+#define LTC_MDSA_DELTA 992
 
-/* Max DSA group size in bytes (default allows 4k-bit groups) */
-#define LTC_MDSA_MAX_GROUP 512
+/* Max DSA group size in bytes */
+#define LTC_MDSA_MAX_GROUP 64
+
+/* Max DSA modulus size in bytes (the actual DSA size, max 8192 bits) */
+#define LTC_MDSA_MAX_MODULUS 1024
 
 /** DSA key structure */
 typedef struct {
@@ -526,43 +548,43 @@ typedef struct ltc_asn1_list_ {
    struct ltc_asn1_list_ *prev, *next, *child, *parent;
 } ltc_asn1_list;
 
-#define LTC_SET_ASN1(list, index, Type, Data, Size)  \
-   do {                                              \
-      int LTC_MACRO_temp            = (index);       \
-      ltc_asn1_list *LTC_MACRO_list = (list);        \
-      LTC_MACRO_list[LTC_MACRO_temp].type = (Type);  \
-      LTC_MACRO_list[LTC_MACRO_temp].data = (void*)(Data);  \
-      LTC_MACRO_list[LTC_MACRO_temp].size = (Size);  \
-      LTC_MACRO_list[LTC_MACRO_temp].used = 0;       \
-      LTC_MACRO_list[LTC_MACRO_temp].optional = 0;   \
-      LTC_MACRO_list[LTC_MACRO_temp].klass = 0;      \
-      LTC_MACRO_list[LTC_MACRO_temp].pc = 0;         \
-      LTC_MACRO_list[LTC_MACRO_temp].tag = 0;        \
+#define LTC_SET_ASN1(list, index, Type, Data, Size)               \
+   do {                                                           \
+      int LTC_TMPVAR(SA)            = (index);                    \
+      ltc_asn1_list *LTC_TMPVAR(SA_list) = (list);                \
+      LTC_TMPVAR(SA_list)[LTC_TMPVAR(SA)].type = (Type);          \
+      LTC_TMPVAR(SA_list)[LTC_TMPVAR(SA)].data = (void*)(Data);   \
+      LTC_TMPVAR(SA_list)[LTC_TMPVAR(SA)].size = (Size);          \
+      LTC_TMPVAR(SA_list)[LTC_TMPVAR(SA)].used = 0;               \
+      LTC_TMPVAR(SA_list)[LTC_TMPVAR(SA)].optional = 0;           \
+      LTC_TMPVAR(SA_list)[LTC_TMPVAR(SA)].klass = 0;              \
+      LTC_TMPVAR(SA_list)[LTC_TMPVAR(SA)].pc = 0;                 \
+      LTC_TMPVAR(SA_list)[LTC_TMPVAR(SA)].tag = 0;                \
    } while (0)
 
-#define LTC_SET_ASN1_IDENTIFIER(list, index, Class, Pc, Tag)      \
-   do {                                                           \
-      int LTC_MACRO_temp            = (index);                    \
-      ltc_asn1_list *LTC_MACRO_list = (list);                     \
-      LTC_MACRO_list[LTC_MACRO_temp].type = LTC_ASN1_CUSTOM_TYPE; \
-      LTC_MACRO_list[LTC_MACRO_temp].klass = (Class);             \
-      LTC_MACRO_list[LTC_MACRO_temp].pc = (Pc);                   \
-      LTC_MACRO_list[LTC_MACRO_temp].tag = (Tag);                 \
+#define LTC_SET_ASN1_IDENTIFIER(list, index, Class, Pc, Tag)               \
+   do {                                                                    \
+      int LTC_TMPVAR(SAI)       = (index);                                 \
+      ltc_asn1_list *LTC_TMPVAR(SAI_list) = (list);                        \
+      LTC_TMPVAR(SAI_list)[LTC_TMPVAR(SAI)].type = LTC_ASN1_CUSTOM_TYPE;   \
+      LTC_TMPVAR(SAI_list)[LTC_TMPVAR(SAI)].klass = (Class);               \
+      LTC_TMPVAR(SAI_list)[LTC_TMPVAR(SAI)].pc = (Pc);                     \
+      LTC_TMPVAR(SAI_list)[LTC_TMPVAR(SAI)].tag = (Tag);                   \
    } while (0)
 
-#define LTC_SET_ASN1_CUSTOM_CONSTRUCTED(list, index, Class, Tag, Data)    \
-   do {                                                           \
-      int LTC_MACRO_temp##__LINE__ = (index);                     \
-      LTC_SET_ASN1(list, LTC_MACRO_temp##__LINE__, LTC_ASN1_CUSTOM_TYPE, Data, 1);   \
-      LTC_SET_ASN1_IDENTIFIER(list, LTC_MACRO_temp##__LINE__, Class, LTC_ASN1_PC_CONSTRUCTED, Tag);       \
+#define LTC_SET_ASN1_CUSTOM_CONSTRUCTED(list, index, Class, Tag, Data)                       \
+   do {                                                                                      \
+      int LTC_TMPVAR(SACC) = (index);                                                        \
+      LTC_SET_ASN1(list, LTC_TMPVAR(SACC), LTC_ASN1_CUSTOM_TYPE, Data, 1);                   \
+      LTC_SET_ASN1_IDENTIFIER(list, LTC_TMPVAR(SACC), Class, LTC_ASN1_PC_CONSTRUCTED, Tag);  \
    } while (0)
 
-#define LTC_SET_ASN1_CUSTOM_PRIMITIVE(list, index, Class, Tag, Type, Data, Size)    \
-   do {                                                           \
-      int LTC_MACRO_temp##__LINE__ = (index);                     \
-      LTC_SET_ASN1(list, LTC_MACRO_temp##__LINE__, LTC_ASN1_CUSTOM_TYPE, Data, Size);   \
-      LTC_SET_ASN1_IDENTIFIER(list, LTC_MACRO_temp##__LINE__, Class, LTC_ASN1_PC_PRIMITIVE, Tag);       \
-      list[LTC_MACRO_temp##__LINE__].used = (int)(Type);       \
+#define LTC_SET_ASN1_CUSTOM_PRIMITIVE(list, index, Class, Tag, Type, Data, Size)          \
+   do {                                                                                   \
+      int LTC_TMPVAR(SACP) = (index);                                                     \
+      LTC_SET_ASN1(list, LTC_TMPVAR(SACP), LTC_ASN1_CUSTOM_TYPE, Data, Size);             \
+      LTC_SET_ASN1_IDENTIFIER(list, LTC_TMPVAR(SACP), Class, LTC_ASN1_PC_PRIMITIVE, Tag); \
+      list[LTC_TMPVAR(SACP)].used = (int)(Type);                                          \
    } while (0)
 
 extern const char*          der_asn1_class_to_string_map[];
@@ -632,8 +654,8 @@ int der_encode_setof(const ltc_asn1_list *list, unsigned long inlen,
                      unsigned char *out,        unsigned long *outlen);
 
 /* VA list handy helpers with triplets of <type, size, data> */
-int der_encode_sequence_multi(unsigned char *out, unsigned long *outlen, ...);
-int der_decode_sequence_multi(const unsigned char *in, unsigned long inlen, ...);
+int der_encode_sequence_multi(unsigned char *out, unsigned long *outlen, ...) LTC_NULL_TERMINATED;
+int der_decode_sequence_multi(const unsigned char *in, unsigned long inlen, ...) LTC_NULL_TERMINATED;
 
 /* FLEXI DECODER handle unknown list decoder */
 int  der_decode_sequence_flexi(const unsigned char *in, unsigned long *inlen, ltc_asn1_list **out);
